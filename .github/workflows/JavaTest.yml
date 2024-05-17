@@ -22,6 +22,6 @@ jobs:
     - name: Build Docker image
       run: docker build -t vmfx/java-tests ./lab4
     - name: Push image to Docker Hub
-      run: docker push vmfx/go-tests
+      run: docker push vmfx/java-tests
     - name: Run tests in Docker container
-      run: docker run vmfx/go-tests
+      run: docker run vmfx/java-tests
