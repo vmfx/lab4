@@ -1,4 +1,4 @@
-name: Run Tests in Docker Container
+name: Test
 
 on:
   push:
@@ -6,17 +6,8 @@ on:
       - main
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
-
-    services:
-      docker:
-        image: docker:19.03.12
-        options: --privileged
-        ports:
-          - 2375:2375
-        env:
-          DOCKER_TLS_CERTDIR: ""
 
     steps:
       - name: Checkout repository
@@ -28,8 +19,8 @@ jobs:
           distribution: 'adopt'
           java-version: '11'
 
-      - name: Build Docker image for tests
-        run: docker build -t my-test-image .
+      - name: Build with Maven
+        run: mvn clean package
 
-      - name: Run tests in Docker container
-        run: docker run my-test-image mvn test
+      - name: Run tests
+        run: mvn test
