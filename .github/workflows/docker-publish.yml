@@ -36,5 +36,5 @@ jobs:
           curl -X PATCH \
             -H "Accept: application/vnd.github.v3+json" \
             -H "Authorization: Bearer ${{ secrets.CR_PAT }}" \
-            https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/your-repo-name%2Fyour-app/versions/latest \
+            https://api.github.com/orgs/vmfx/packages/container/lab4%2Flab4/versions/latest \
             -d '{"visibility":"public"}'
