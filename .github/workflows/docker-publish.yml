@@ -22,6 +22,9 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
+      - name: Run tests in Docker container
+        run: docker run --rm -v $PWD:/app -w /app openjdk:11-jre-slim mvn test
+
       - name: Log in to GitHub Container Registry
         run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
