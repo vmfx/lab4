@@ -1,13 +1,21 @@
 name: Test Java 
-
 on:
   push:
     branches:
       - main
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:19.03.12
+        options: --privileged
+        ports:
+          - 2375:2375
+        env:
+          DOCKER_TLS_CERTDIR: ""
 
     steps:
       - name: Checkout repository
@@ -22,24 +30,9 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
+      - name: Build Docker image
+        run: docker build . -t my-test-image
+
       - name: Run tests in Docker container
         run: |
-          docker build -t myapp .
-          docker run myapp mvn test
-
-      - name: Log in to GitHub Container Registry
-        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
-
-      - name: Build Docker image
-        run: docker build . -t ghcr.io/${{ github.repository_owner }}/lab4:latest
-
-      - name: Push Docker image
-        run: docker push ghcr.io/${{ github.repository_owner }}/lab4:latest
-
-      - name: Set visibility to public
-        run: |
-          curl -X PATCH \
-            -H "Accept: application/vnd.github.v3+json" \
-            -H "Authorization: Bearer ${{ secrets.CR_PAT }}" \
-            https://api.github.com/orgs/vmfx/packages/container/lab4%2Flab4/versions/latest \
-            -d '{"visibility":"public"}'
+          docker run my-test-image mvn test
