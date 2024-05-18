@@ -22,10 +22,8 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      - name: Login to GitHub Container Registry
-        env:
-          CR_PAT: ${{ secrets.CR_PAT }}
-        run: echo $CR_PAT | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+      - name: Log in to GitHub Container Registry
+        run: echo ${{ secrets.CR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Build Docker image
         run: docker build . -t ghcr.io/${{ github.repository_owner }}/lab4:latest
@@ -33,5 +31,10 @@ jobs:
       - name: Push Docker image
         run: docker push ghcr.io/${{ github.repository_owner }}/lab4:latest
 
-      - name: Run Docker container
-        run: docker run -d ghcr.io/${{ github.repository_owner }}/lab4:latest
+      - name: Set visibility to public
+        run: |
+          curl -X PATCH \
+            -H "Accept: application/vnd.github.v3+json" \
+            -H "Authorization: Bearer ${{ secrets.CR_PAT }}" \
+            https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/your-repo-name%2Fyour-app/versions/latest \
+            -d '{"visibility":"public"}'
