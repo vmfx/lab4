@@ -1,15 +1,24 @@
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class ReferenceTypesTests {
 
     @Test
-    public void testReferenceTypes() {
-        StringBuilder sb1 = new StringBuilder("Hello");
-        StringBuilder sb2 = sb1;
+    public void testHeapUsageForReferenceType() throws InterruptedException {
+     
+        System.gc();
+        Thread.sleep(1000);
+        long heapSizeBefore = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
 
-        sb1.append(", world!");
+        StringBuilder[] builders = new StringBuilder[1000000];
+        for (int i = 0; i < builders.length; i++) {
+            builders[i] = new StringBuilder("Hello");
+        }
 
-        assertEquals("Hello, world!", sb2.toString(), "Expected content of sb2 to be modified by sb1");
+        System.gc();
+        Thread.sleep(1000);
+        long heapSizeAfter = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+
+        assertTrue(heapSizeAfter > heapSizeBefore, "Expected heap usage to increase for reference types");
     }
 }
